@@ -1,0 +1,28 @@
+{
+  "name": "express-kv-api",
+  "version": "0.0.3",
+  "description": "express插件：key-value 形式，简单模拟api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/talltotal/express-kv-api.git"
+  },
+  "keywords": [
+    "express",
+    "api",
+    "mock"
+  ],
+  "author": "talltotal <talltotal@163.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/talltotal/express-kv-api/issues"
+  },
+  "homepage": "https://github.com/talltotal/express-kv-api#readme",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "node-watch": "^0.5.5"
+  }
+}
