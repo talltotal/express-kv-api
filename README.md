@@ -36,6 +36,27 @@ app.listen(8080)
 
 ```
 
+在`webpack-dev-server`中使用，即增加配置项`after`：
+
+```js
+var kvApi = require('express-kv-api')
+
+const config = {
+  ...,
+  after (app) {
+    app.use(kvApi({
+      dataDeal (data) {
+        return {
+          data: data,
+          code: 200,
+          msg: 'xxx'
+        }
+      }
+    }))
+  }
+}
+```
+
 接口文件，可获取到请求参数，做简单逻辑处理。
 请求地址按[express格式](http://expressjs.com/en/4x/api.html#path-examples),
 返回数据按[mock语法规范](https://github.com/nuysoft/Mock/wiki/Syntax-Specification)。
