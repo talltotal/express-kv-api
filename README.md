@@ -22,15 +22,20 @@ var process = require('process')
 var app = express()
 
 app.use(kvApi({
-  filePath: path.join(process.cwd(), 'server'), // 接口文件夹路径，默认为项目下的`server`文件
-  dataDeal (data) { // 数据处理函数，可用于统一的数据包装，默认直接返回data
+  // 接口文件夹路径，默认为项目下的`server`文件，支持 json/js 文件
+  dirPath: path.join(process.cwd(), 'server'),
+  // 数据处理函数，可用于统一的数据包装，默认直接返回data
+  dataWrap (data) {
     return {
       success: true,
       data: data,
       message: '请求成功',
     }
-  }
+  },
+  // 以目录结构划分模块
+  moduleByPath: false,
 }))
+
 app.listen(8080)
 ...
 
@@ -45,13 +50,13 @@ const config = {
   ...,
   after (app) {
     app.use(kvApi({
-      dataDeal (data) {
+      dataWrap (data) {
         return {
+          success: true,
           data: data,
-          code: 200,
-          msg: 'xxx'
+          message: '请求成功',
         }
-      }
+      },
     }))
   }
 }
@@ -66,8 +71,9 @@ const config = {
 module.exports = {
   /**
    * 指明method为post，默认为get
+   * 延迟1000ms请求返回
    */
-  'post /api/add': true,
+  'post|1000 /api/add': true,
   /**
    * function形式，将参数传入
    * {
