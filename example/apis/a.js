@@ -22,4 +22,5 @@ module.exports = {
         console.log(ff)
         return true
     },
+    'post|1000 /upload': true
 }

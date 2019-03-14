@@ -37,6 +37,14 @@ describe('base', () => {
         .get('/a/error')
         .expect(500, 'Api Error: ReferenceError: ff is not defined', done)
     })
+
+    it('should upload success', (done) => {
+        request(app)
+        .post('/a/upload')
+        .field('name', 'my awesome avatar')
+        .attach('avatar', 'test/me.png')
+        .expect(200, done)
+    })
 })
 
 describe('params', () => {

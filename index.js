@@ -17,9 +17,6 @@
  * - 匹配([method]~[path/regexp])并处理({ dalay, value })请求
  * 
  * TODO
- * - 文件上传
- * - 模块化
- *  - 按文件名
  * - 代理
  */
 const path = require('path')
