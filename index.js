@@ -62,7 +62,11 @@ function resetApisFromDir (apiObj) {
   const dir = Options.dirPath
   glob(path.join(dir, '**/*.{json,js}'), (err, files) => {
     _.forEach(files, (apiFilePath) => {
-      addApisFromFile(apiObj, apiFilePath)
+      try {
+        addApisFromFile(apiObj, apiFilePath)
+      } catch (e) {
+        console.error('Express_kv_api::error:', e)
+      }
     })
   })
 }
