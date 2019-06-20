@@ -12,6 +12,13 @@ app.use(kvApi({
       msg: '请求成功',
     }
   },
+  reqDateWarp (req, params) {
+    return {
+      params,
+      ...req.query,
+      ...req.body,
+    }
+  },
   moduleByPath: true,
 }))
 

@@ -1,6 +1,12 @@
 const path = require('path')
 
 module.exports = {
+    '/getArg' (arg) {
+        return arg
+    },
+    'post /postArg' (arg) {
+        return arg
+    },
     '/getList': {
         'total|50-100': 80,
         'list|20': [{

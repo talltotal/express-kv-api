@@ -85,15 +85,10 @@ function matchApiAndHandle (req, res, apiObj) {
     const match = pR.exec(path)
 
     if (path === '*' || match) {
-      const params = _.extend(
-        {
-          params: [].slice.call(match, 1),
-        },
-        req.query,
-        req.body,
-      )
-
-      handleRes(methodObj[key], params, res)
+      handleRes(methodObj[key], {
+        req,
+        params: [].slice.call(match, 1),
+      }, res)
 
       return true
     }
@@ -137,11 +132,11 @@ function addApiFromObj (target, source, ...namespaces) {
   })
 }
 
-function handleRes ({ delay, value}, params, res) {
+function handleRes ({ delay, value }, { req, params }, res) {
   function main () {
     if (typeof value === 'function') {
       try {
-        const result = value(params)
+        const result = value(Options.reqDataWrap(req, params))
   
         if (typeof result === 'function') {
           result(res)
@@ -163,12 +158,21 @@ function handleRes ({ delay, value}, params, res) {
   }
 }
 
-module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, moduleByPath } = {}) {
+module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, moduleByPath, reqDataWrap } = {}) {
   let Api = {}
 
   Options.dirPath = path.join(process.cwd(), filePath || dirPath)
   Options.dataWrap = dataDeal || dataWrap || function (data) {
     return data
+  }
+  Options.reqDataWrap = reqDataWrap || function (req, params) {
+    return _.extend(
+      {
+        params,
+      },
+      req.query,
+      req.body,
+    )
   }
   Options.moduleByPath = !!moduleByPath
 
