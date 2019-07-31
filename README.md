@@ -34,6 +34,8 @@ app.use(kvApi({
   },
   // 以目录结构划分模块
   moduleByPath: false,
+  // 请求的默认方法，默认为all
+  defaultMathod: 'post'
 }))
 
 app.listen(8080)
@@ -70,7 +72,7 @@ const config = {
 ```js
 module.exports = {
   /**
-   * 指明method为post，默认为get
+   * 指明method为post，默认为all
    * 延迟1000ms请求返回
    */
   'post|1000 /api/add': true,

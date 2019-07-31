@@ -98,3 +98,21 @@ describe('namespace', () => {
         .expect(200, done)
     })
 })
+
+describe('defaultMathod', () => {
+    it('should match get method', (done) => {
+        request(app)
+        .get('/b/b1/list')
+        .expect(200, done)
+    })
+    it('should match post method', (done) => {
+        request(app)
+        .post('/b/b1/list')
+        .expect(200, done)
+    })
+    it('should match put method', (done) => {
+        request(app)
+        .put('/b/b1/list')
+        .expect(200, done)
+    })
+})

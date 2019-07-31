@@ -4,7 +4,7 @@ var kvApi = require('../index')
 var app = express()
 
 app.use(kvApi({
-  dirPath: 'example/apis',
+  dirPath: './example/apis',
   dataWrap (data) {
     return {
       code: 20000,

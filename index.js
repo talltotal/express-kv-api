@@ -29,6 +29,7 @@ const pathRegexp = require('path-to-regexp')
 const glob = require('glob')
 
 const Options = {
+  defaultMathod: 'all',
   dirPath: undefined,
   dataWrap: undefined,
   moduleByPath: false,
@@ -37,17 +38,17 @@ const Options = {
 const Key = {
   parse (str) {
     // 默认为 get 请求
-    let method = 'get'
+    let method = Options.defaultMathod || 'all'
     let delay = 0
     let path = str
 
     if (str.indexOf(' ') > -1) {
       try {
         const mp = str.split(' ')
-        const md = mp[0].split('|')
+        const [lMethod, lDelay] = mp[0].split('|')
 
-        method = md[0].toLowerCase() || 'get'
-        delay = Number(md[1] || 0)
+        method = (lMethod || method).toLowerCase()
+        delay = Number(lDelay || 0)
         path = mp[1]
       } catch (err) {
         console.error('Express-kv-api: Key parse error!')
@@ -74,23 +75,22 @@ function resetApisFromDir (apiObj) {
 function matchApiAndHandle (req, res, apiObj) {
   const method = req.method.toLowerCase()
   const path = req.path
-  const methodObj = apiObj[method]
-
-  if (!methodObj) return false
-
-  for (let key in methodObj) {
-    const pR = pathRegexp(key, undefined, {
-      sensitive: true,
-    })
-    const match = pR.exec(path)
-
-    if (path === '*' || match) {
-      handleRes(methodObj[key], {
-        req,
-        params: [].slice.call(match, 1),
-      }, res)
-
-      return true
+  const methodObjs = [apiObj[method] || {}, apiObj.all || {}]
+  for (let methodObj of methodObjs) {
+    for (let key in methodObj) {
+      const pR = pathRegexp(key, undefined, {
+        sensitive: true,
+      })
+      const match = pR.exec(path)
+  
+      if (path === '*' || match) {
+        handleRes(methodObj[key], {
+          req,
+          params: [].slice.call(match, 1),
+        }, res)
+  
+        return true
+      }
     }
   }
 
@@ -158,7 +158,7 @@ function handleRes ({ delay, value }, { req, params }, res) {
   }
 }
 
-module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, moduleByPath, reqDataWrap } = {}) {
+module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, moduleByPath, reqDataWrap, defaultMathod = 'all' } = {}) {
   let Api = {}
 
   Options.dirPath = path.join(process.cwd(), filePath || dirPath)
@@ -175,6 +175,7 @@ module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, m
     )
   }
   Options.moduleByPath = !!moduleByPath
+  Options.defaultMathod = defaultMathod
 
   resetApisFromDir(Api)
   watch(Options.dirPath, { recursive: true }, () => {
