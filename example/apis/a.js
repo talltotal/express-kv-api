@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-    '/getArg' (arg) {
+    '/getArg/:id' (arg) {
         return arg
     },
     'post /postArg' (arg) {

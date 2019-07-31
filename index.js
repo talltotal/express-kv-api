@@ -170,6 +170,7 @@ module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, m
       {
         params,
       },
+      req.params,
       req.query,
       req.body,
     )

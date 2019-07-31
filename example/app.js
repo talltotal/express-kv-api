@@ -1,8 +1,11 @@
 var express = require('express')
+var bodyParser = require('body-parser')
 var kvApi = require('../index')
 
 var app = express()
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
 app.use(kvApi({
   dirPath: './example/apis',
   dataWrap (data) {
@@ -12,11 +15,13 @@ app.use(kvApi({
       msg: '请求成功',
     }
   },
-  reqDateWarp (req, params) {
+  reqDataWrap (req, params) {
     return {
       params,
+      ...req.params,
       ...req.query,
       ...req.body,
+      tt: 1
     }
   },
   moduleByPath: true,

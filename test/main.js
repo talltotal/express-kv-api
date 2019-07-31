@@ -99,6 +99,26 @@ describe('namespace', () => {
     })
 })
 
+describe('reqDateWarp', () => {
+    it('should match reqDate', (done) => {
+        request(app)
+        .post('/a/getArg/123?dd=2')
+        .send({ name: 'john' })
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200, {
+            code: 20000,
+            msg: '请求成功',
+            data: {
+                tt: 1,
+                dd: '2',
+                name: 'john',
+                params: ['123']
+            },
+        }, done)
+    })
+})
+
 describe('defaultMathod', () => {
     it('should match get method', (done) => {
         request(app)
