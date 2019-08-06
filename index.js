@@ -160,8 +160,11 @@ function handleRes ({ delay, value }, { req, params }, res) {
 
 module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, moduleByPath, reqDataWrap, defaultMathod = 'all' } = {}) {
   let Api = {}
-
-  Options.dirPath = path.join(process.cwd(), filePath || dirPath)
+  let _filePath = filePath || dirPath
+  if (!fs.existsSync(_filePath)) {
+    _filePath = path.join(process.cwd(), _filePath)
+  }
+  Options.dirPath = _filePath
   Options.dataWrap = dataDeal || dataWrap || function (data) {
     return data
   }
