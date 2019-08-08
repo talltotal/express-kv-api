@@ -163,6 +163,8 @@ module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, m
   let _filePath = filePath || dirPath
   if (!fs.existsSync(_filePath)) {
     _filePath = path.join(process.cwd(), _filePath)
+  } else {
+    _filePath = path.resolve(_filePath)
   }
   Options.dirPath = _filePath
   Options.dataWrap = dataDeal || dataWrap || function (data) {
