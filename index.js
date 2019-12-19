@@ -25,7 +25,7 @@ const fs = require('fs')
 const _ = require('lodash')
 const watch = require('node-watch')
 const Mock = require('mockjs')
-const pathRegexp = require('path-to-regexp')
+const { pathToRegexp } = require('path-to-regexp')
 const glob = require('glob')
 
 const Options = {
@@ -78,7 +78,7 @@ function matchApiAndHandle (req, res, apiObj) {
   const methodObjs = [apiObj[method] || {}, apiObj.all || {}]
   for (let methodObj of methodObjs) {
     for (let key in methodObj) {
-      const pR = pathRegexp(key, undefined, {
+      const pR = pathToRegexp(key, undefined, {
         sensitive: true,
       })
       const match = pR.exec(path)

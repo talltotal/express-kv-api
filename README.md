@@ -2,25 +2,30 @@
 
 express插件：key-value 形式，简单模拟api，结合 mockjs 更灵活。最简单的后端请求模拟方式，可用于前端本地测试。
 
-## use
-
-安装：
+## Installation
 
 ```cmd
 npm install express-kv-api --save-dev
 ```
 
-在server文件中拦截请求：
+## Usage
+
+### Server
+#### for `express`
 
 ```js
-var kvApi = require('express-kv-api')
 
-var express = require('express')
-var path = require('path')
-var process = require('process')
+const bodyParser = require('body-parser')
+const kvApi = require('express-kv-api')
+const express = require('express')
 
-var app = express()
+const path = require('path')
+const process = require('process')
 
+const app = express()
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 app.use(kvApi({
   // 接口文件夹路径，默认为项目下的`server`文件，支持 json/js 文件
   dirPath: path.join(process.cwd(), 'server'),
@@ -43,14 +48,17 @@ app.listen(8080)
 
 ```
 
-在`webpack-dev-server`中使用，即增加配置项`after`：
+#### for `webpack-dev-server`
 
 ```js
-var kvApi = require('express-kv-api')
+const bodyParser = require('body-parser')
+const kvApi = require('express-kv-api')
 
 const config = {
   ...,
   after (app) {
+    app.use(bodyParser.urlencoded({ extended: false }))
+    app.use(bodyParser.json())
     app.use(kvApi({
       dataWrap (data) {
         return {
@@ -64,6 +72,34 @@ const config = {
 }
 ```
 
+#### for `@vue/cli-service`
+
+```js
+const bodyParser = require('body-parser')
+const kvApi = require('express-kv-api')
+
+const config = {
+  ...,
+  devServer: {
+    ...,
+    after (app) {
+      app.use(bodyParser.urlencoded({ extended: false }))
+      app.use(bodyParser.json())
+      app.use(kvApi({
+        dataWrap (data) {
+          return {
+            success: true,
+            data: data,
+            message: '请求成功',
+          }
+        },
+      }))
+    }
+  }
+}
+```
+
+### API
 接口文件，可获取到请求参数，做简单逻辑处理。
 请求地址按[express格式](http://expressjs.com/en/4x/api.html#path-examples),
 返回数据按[mock语法规范](https://github.com/nuysoft/Mock/wiki/Syntax-Specification)。
@@ -98,3 +134,4 @@ module.exports = {
   },
 }
 ```
+
