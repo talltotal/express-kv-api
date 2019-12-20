@@ -182,7 +182,7 @@ module.exports = function ({ filePath, dirPath = 'server', dataDeal, dataWrap, m
     )
   }
   Options.moduleByPath = !!moduleByPath
-  Options.defaultMathod = defaultMathod
+  Options.defaultMathod = (defaultMathod || '').toLowerCase()
 
   resetApisFromDir(Api)
   watch(Options.dirPath, { recursive: true }, () => {
