@@ -98,7 +98,8 @@ function matchApiAndHandle (req, res, apiObj) {
 }
 
 function addApisFromFile (apiObj, apiFilePath) {
-  const isHideFile = !!apiFilePath.match(/(\/\.)|(\\\.)/g)
+  const relativePath = path.relative(Options.dirPath, apiFilePath)
+  const isHideFile = !!relativePath.match(/(\/\.)|(\\\.)/g)
   if (isHideFile) return
 
   // 清除缓存

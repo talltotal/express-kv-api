@@ -4,7 +4,7 @@ var kvApi = require('../index')
 
 var app = express()
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(kvApi({
   dirPath: './example/apis',
