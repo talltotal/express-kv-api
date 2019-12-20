@@ -37,6 +37,15 @@ app.use(kvApi({
       message: '请求成功',
     }
   },
+  // 返回对象用于「函数」类型value，以下为默认方式
+  reqDataWrap (req, params) {
+    return {
+      params,
+      ...req.params,
+      ...req.query,
+      ...req.body
+    }
+  },
   // 以目录结构划分模块
   moduleByPath: false,
   // 请求的默认方法，默认为all
@@ -59,15 +68,7 @@ const config = {
   after (app) {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
-    app.use(kvApi({
-      dataWrap (data) {
-        return {
-          success: true,
-          data: data,
-          message: '请求成功',
-        }
-      },
-    }))
+    app.use(kvApi())
   }
 }
 ```
@@ -85,16 +86,19 @@ const config = {
     after (app) {
       app.use(bodyParser.urlencoded({ extended: false }))
       app.use(bodyParser.json())
-      app.use(kvApi({
-        dataWrap (data) {
-          return {
-            success: true,
-            data: data,
-            message: '请求成功',
-          }
-        },
-      }))
+      app.use(kvApi())
     }
+  }
+}
+```
+
+#### for `vuepress@1.x`
+
+```js
+const config = {
+  ...,
+  beforeDevServer (app) {
+    app.use(kvApi())
   }
 }
 ```
