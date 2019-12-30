@@ -1,8 +1,8 @@
-const { app, server } = require('../example/app')
+const { app, getServer } = require('../example/app')
 const request = require('supertest')
 
 after(() => {
-    server.close()
+    getServer().close()
 })
 
 describe('base', () => {

@@ -1,8 +1,14 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var kvApi = require('../index')
+const express = require('express')
+const bodyParser = require('body-parser')
+const kvApi = require('../index')
+const app = express()
+const portfinder = require('portfinder')
+const getServer = () => {
+  return server
+}
+let server
 
-var app = express()
+portfinder.basePort = 8080
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -27,7 +33,9 @@ app.use(kvApi({
   moduleByPath: true,
 }))
 
-const server = app.listen(8080)
-console.log('Start App: 8080')
+portfinder.getPortPromise().then((port) => {
+  server = app.listen(port)
+  console.log(`Start App: ${port}`)
+})
 
-module.exports = { app, server }
+module.exports = { app, getServer }
