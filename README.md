@@ -29,6 +29,8 @@ app.use(bodyParser.json())
 app.use(kvApi({
   // 接口文件夹路径，默认为项目下的`server`文件，支持 json/js 文件
   dirPath: path.join(process.cwd(), 'server'),
+  // 是否监听接口文件夹内变动，默认true
+  watch: true,
   // 数据处理函数，可用于统一的数据包装，默认直接返回data
   dataWrap (data) {
     return {

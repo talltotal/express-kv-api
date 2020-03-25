@@ -178,6 +178,7 @@ function handleRes ({ delay, value }, { req, params }, res) {
  * @param {(data: any) => any} [opts.dataWrap] warp response data；处理数据整体包装函数
  * @param {string} [opts.defaultMathod] default mathod for routers matching；请求的默认方法
  * @param {boolean} [opts.moduleByPath] 以目录结构划分模块
+ * @param {boolean} [opts.watch] 是否监听接口文件夹内变动
  * @param {(req: Request, params: Array) => any} [opts.reqDataWrap] warp request data for routers
  * @returns {(req: Request, res: Response, next: Function) => any}
  */
@@ -189,7 +190,8 @@ module.exports = function (opts = {}) {
     dataWrap,
     moduleByPath,
     reqDataWrap,
-    defaultMathod
+    defaultMathod,
+    watch: isWatch = true
   } = opts
   let Api = {}
   let _filePath = filePath || dirPath
@@ -205,10 +207,12 @@ module.exports = function (opts = {}) {
   Options.defaultMathod = (defaultMathod || Options.defaultMathod).toLowerCase()
 
   resetApisFromDir(Api)
-  watch(Options.dirPath, { recursive: true }, () => {
-    Api = {}
-    resetApisFromDir(Api)
-  })
+  if (isWatch) {
+    watch(Options.dirPath, { recursive: true }, () => {
+      Api = {}
+      resetApisFromDir(Api)
+    })
+  }
 
   return function (req, res, next) {
     if (!matchApiAndHandle(req, res, Api)) {
