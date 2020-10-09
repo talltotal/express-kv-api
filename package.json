@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run dev",
     "dev": "node ./example/app.js",
-    "test": "mocha"
+    "test": "mocha",
+    "doc": "jsdoc -d ./docs -c ./jsdoc.conf.json ./index.js"
   },
   "repository": {
     "type": "git",

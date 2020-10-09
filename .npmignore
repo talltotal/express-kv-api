@@ -1,3 +1,5 @@
 test/
 example/
 yarn.lock
+docs/
+jsdoc.conf.json
