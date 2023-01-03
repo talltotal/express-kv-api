@@ -5,7 +5,7 @@
  * - value:
  *    - mockData
  *    - funtion ({ params: [...path/regexp], ...query, ...body }) { return mockData || function (response) {} }
- * 
+ *
  * 处理过程
  * - 文件夹内任何变动都重新加载api
  * - 文件中都kv转变格式用于处理
@@ -17,14 +17,14 @@
  * @module Express_kv_api
  */
 
-const path = require('path')
-const process = require('process')
-const fs = require('fs')
-const _ = require('lodash')
-const watch = require('node-watch')
-const Mock = require('mockjs')
-const { pathToRegexp } = require('path-to-regexp')
-const glob = require('glob')
+const path = require('path');
+const process = require('process');
+const fs = require('fs');
+const _ = require('lodash');
+const watch = require('node-watch');
+const Mock = require('mockjs');
+const { pathToRegexp } = require('path-to-regexp');
+const glob = require('glob');
 
 /**
  * @callback DataWrap
@@ -58,15 +58,16 @@ const Options = {
   moduleByPath: false,
   reqDataWrap: (req, params = []) => {
     return _.extend(
+      Array.isArray(req.body) ? { length: req.body.length } : {},
       {
         params,
       },
       req.params,
       req.query,
       req.body,
-    )
+    );
   },
-}
+};
 
 /** @namespace */
 const Key = {
@@ -75,44 +76,44 @@ const Key = {
    * @param {string} str key字符串
    * @returns {{method: string, delay: number, path: string}}
    */
-  parse (str) {
+  parse(str) {
     // 默认为 get 请求
-    let method = Options.defaultMathod || 'all'
-    let delay = 0
-    let path = str
+    let method = Options.defaultMathod || 'all';
+    let delay = 0;
+    let path = str;
 
     if (str.indexOf(' ') > -1) {
       try {
-        const mp = str.split(' ')
-        const [lMethod, lDelay] = mp[0].split('|')
+        const mp = str.split(' ');
+        const [lMethod, lDelay] = mp[0].split('|');
 
-        method = (lMethod || method).toLowerCase()
-        delay = Number(lDelay || 0)
-        path = mp[1]
+        method = (lMethod || method).toLowerCase();
+        delay = Number(lDelay || 0);
+        path = mp[1];
       } catch (err) {
-        console.error('Express-kv-api: Key parse error!')
+        console.error('Express-kv-api: Key parse error!');
       }
     }
 
-    return { method, delay, path }
+    return { method, delay, path };
   },
-}
+};
 
 /**
  * 从文件获取数据重置接口对象
  * @param {Object} apiObj 接口对象
  */
-function resetApisFromDir (apiObj) {
-  const dir = Options.dirPath
+function resetApisFromDir(apiObj) {
+  const dir = Options.dirPath;
   glob(path.join(dir, '**/*.{json,js}'), (err, files) => {
     _.forEach(files, (apiFilePath) => {
       try {
-        addApisFromFile(apiObj, apiFilePath)
+        addApisFromFile(apiObj, apiFilePath);
       } catch (e) {
-        console.error('Express_kv_api::error:', e)
+        console.error('Express_kv_api::error:', e);
       }
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -122,29 +123,33 @@ function resetApisFromDir (apiObj) {
  * @param {Object} apiObj 接口对象
  * @returns {boolean}
  */
-function matchApiAndHandle (req, res, apiObj) {
-  const method = req.method.toLowerCase()
-  const path = req.path
-  const methodObjs = [apiObj[method] || {}, apiObj.all || {}]
+function matchApiAndHandle(req, res, apiObj) {
+  const method = req.method.toLowerCase();
+  const path = req.path;
+  const methodObjs = [apiObj[method] || {}, apiObj.all || {}];
   for (let methodObj of methodObjs) {
     for (let key in methodObj) {
       const pR = pathToRegexp(key, undefined, {
         sensitive: true,
-      })
-      const match = pR.exec(path)
-  
+      });
+      const match = pR.exec(path);
+
       if (path === '*' || match) {
-        handleRes(methodObj[key], {
-          req,
-          params: [].slice.call(match, 1),
-        }, res)
-  
-        return true
+        handleRes(
+          methodObj[key],
+          {
+            req,
+            params: [].slice.call(match, 1),
+          },
+          res,
+        );
+
+        return true;
       }
     }
   }
 
-  return false
+  return false;
 }
 
 /**
@@ -152,27 +157,29 @@ function matchApiAndHandle (req, res, apiObj) {
  * @param {Object} apiObj 接口对象
  * @param {string} apiFilePath 接口配置文件路径
  */
-function addApisFromFile (apiObj, apiFilePath) {
-  const relativePath = path.relative(Options.dirPath, apiFilePath)
-  const isHideFile = !!relativePath.match(/(\/\.)|(\\\.)/g)
-  if (isHideFile) return
+function addApisFromFile(apiObj, apiFilePath) {
+  const relativePath = path.relative(Options.dirPath, apiFilePath);
+  const isHideFile = !!relativePath.match(/(\/\.)|(\\\.)/g);
+  if (isHideFile) return;
 
   // 清除缓存
-  delete require.cache[apiFilePath]
+  delete require.cache[apiFilePath];
 
-  const fileData = require(apiFilePath)
-  const childPath = apiFilePath.replace(new RegExp(`^${Options.dirPath}`), '')
-  const childPathObj = path.parse(childPath)
-  const baseNamespace = Options.moduleByPath ? `${childPathObj.dir}${path.sep}${childPathObj.name}` : ''
+  const fileData = require(apiFilePath);
+  const childPath = apiFilePath.replace(new RegExp(`^${Options.dirPath}`), '');
+  const childPathObj = path.parse(childPath);
+  const baseNamespace = Options.moduleByPath
+    ? `${childPathObj.dir}${path.sep}${childPathObj.name}`
+    : '';
 
   if (_.isArray(fileData)) {
     _.forEach(fileData, ({ namespace, api }) => {
       if (_.isString(namespace) && _.isObject(api)) {
-        addApiFromObj(apiObj, api, baseNamespace, namespace)
+        addApiFromObj(apiObj, api, baseNamespace, namespace);
       }
-    })
+    });
   } else if (_.isObject(fileData)) {
-    addApiFromObj(apiObj, fileData, baseNamespace)
+    addApiFromObj(apiObj, fileData, baseNamespace);
   }
 }
 
@@ -182,16 +189,16 @@ function addApisFromFile (apiObj, apiFilePath) {
  * @param {Object} source 源对象
  * @param  {...string} namespaces 数据的命名空间
  */
-function addApiFromObj (target, source, ...namespaces) {
+function addApiFromObj(target, source, ...namespaces) {
   Object.keys(source).forEach((key) => {
-    const { method, delay, path: apiPath } = Key.parse(key)
-    const methodObj = target[method] || (target[method] = {})
+    const { method, delay, path: apiPath } = Key.parse(key);
+    const methodObj = target[method] || (target[method] = {});
 
     methodObj[path.join('/', ...namespaces, apiPath)] = {
       delay,
       value: source[key],
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -204,29 +211,29 @@ function addApiFromObj (target, source, ...namespaces) {
  * @param {Object} param1.params 请求参数
  * @param {Response} res 响应
  */
-function handleRes ({ delay, value }, { req, params }, res) {
-  function main () {
+function handleRes({ delay, value }, { req, params }, res) {
+  function main() {
     if (typeof value === 'function') {
       try {
-        const result = value(Options.reqDataWrap(req, params))
-  
+        const result = value(Options.reqDataWrap(req, params));
+
         if (typeof result === 'function') {
-          result(res)
+          result(res);
         } else {
-          res.json(Options.dataWrap(Mock.mock(result)))
+          res.json(Options.dataWrap(Mock.mock(result)));
         }
       } catch (err) {
-        res.status(500).send('Api Error: ' + err)
+        res.status(500).send('Api Error: ' + err);
       }
     } else {
-      res.json(Options.dataWrap(Mock.mock(value)))
+      res.json(Options.dataWrap(Mock.mock(value)));
     }
   }
 
   if (delay) {
-    setTimeout(main, delay)
+    setTimeout(main, delay);
   } else {
-    main()
+    main();
   }
 }
 
@@ -250,32 +257,34 @@ module.exports = function (opts = {}) {
     moduleByPath,
     reqDataWrap,
     defaultMathod,
-    watch: isWatch = true
-  } = opts
-  let Api = {}
-  let _filePath = filePath || dirPath
+    watch: isWatch = true,
+  } = opts;
+  let Api = {};
+  let _filePath = filePath || dirPath;
   if (!fs.existsSync(_filePath)) {
-    _filePath = path.join(process.cwd(), _filePath)
+    _filePath = path.join(process.cwd(), _filePath);
   } else {
-    _filePath = path.resolve(_filePath)
+    _filePath = path.resolve(_filePath);
   }
-  Options.dirPath = _filePath
-  Options.dataWrap = dataDeal || dataWrap || Options.dataWrap
-  Options.reqDataWrap = reqDataWrap || Options.reqDataWrap
-  Options.moduleByPath = !!moduleByPath
-  Options.defaultMathod = (defaultMathod || Options.defaultMathod).toLowerCase()
+  Options.dirPath = _filePath;
+  Options.dataWrap = dataDeal || dataWrap || Options.dataWrap;
+  Options.reqDataWrap = reqDataWrap || Options.reqDataWrap;
+  Options.moduleByPath = !!moduleByPath;
+  Options.defaultMathod = (
+    defaultMathod || Options.defaultMathod
+  ).toLowerCase();
 
-  resetApisFromDir(Api)
+  resetApisFromDir(Api);
   if (isWatch) {
     watch(Options.dirPath, { recursive: true }, () => {
-      Api = {}
-      resetApisFromDir(Api)
-    })
+      Api = {};
+      resetApisFromDir(Api);
+    });
   }
 
   return function (req, res, next) {
     if (!matchApiAndHandle(req, res, Api)) {
-      next()
+      next();
     }
-  }
-}
+  };
+};

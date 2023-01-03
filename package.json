@@ -1,6 +1,6 @@
 {
   "name": "express-kv-api",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "express插件：key-value 形式，简单模拟api",
   "main": "index.js",
   "scripts": {
